@@ -24,3 +24,16 @@ def request_fixture(request):
     if 'pets' or 'pet'  in request.function.__name__:
         print(f"\nЗапущен тест из сьюта Дом Питомца: {request.function.__name__}")
 
+# @pytest.fixture(autouse=True)
+# def delete_data_for_tests():
+#     print ('После прохождения теста, тестовые данные будут удалены с сервера')
+#     yield
+#     status,result = pf.get_list_of_pets(get_auth_key['key'], "my_pets")
+#     while len(result['pets']) > 0:
+#         pet_id = result['pets'][0]['id']
+#         pf.delete_pet(get_auth_key['key'], pet_id)
+#         status, myPets = pf.get_list_of_pets(get_auth_key['key'], "my_pets")
+#         print('Тестовые данные удалены')
+
+
+

@@ -1,12 +1,39 @@
 import pytest
 from conftest import pf
+def generate_string(n):
+   return "x" * n
+
+def russian_chars():
+   return 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя'
+
+# Здесь мы взяли 20 популярных китайских иероглифов
+def chinese_chars():
+   return '的一是不了人我在有他这为之大来以个中上们'
+
+def special_chars():
+   return '|\\/!@#$%^&*()-_=+`~?"№;:[]{}'
+
 
 @pytest.mark.api
 @pytest.mark.get
-def test_get_all_pets(get_auth_key, filter=""):
+@pytest.mark.parametrize("filter",
+                        ['', 'my_pets'],
+                        ids=['empty string', 'only my pets'])
+def test_get_all_pets(get_auth_key, filter):
     status, result = pf.get_list_of_pets(get_auth_key['key'],filter)
     assert status == 200
     assert len(result['pets']) > 0
+
+pytest.mark.xfail(reason="БАГ!!! в реализации АPI") # ожидаемый ответ статус:400, получаем актуальный статус:500.
+@pytest.mark.parametrize("filter",
+                         [generate_string(255),generate_string(1001),russian_chars(),
+                            russian_chars().upper(),chinese_chars(),special_chars(),123],
+                          ids=['255 symbols','more than 1000 symbols','russian','RUSSIAN','chinese','specials','digit'])
+def test_get_all_pets_negative_filter(get_auth_key, filter):
+    status, result = pf.get_list_of_pets(get_auth_key['key'],filter)
+    assert status == 400
+#БАГ! Ожидаемый статус:400, актуальный статус: 500
+
 
 @pytest.mark.api
 @pytest.mark.post
